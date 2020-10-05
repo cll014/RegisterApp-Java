@@ -1,129 +1,145 @@
 package edu.uark.registerapp.models.api;
 
-import org.apache.commons.lang3.StringUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
-public class Employee extends ApiResponse{
+import org.apache.commons.lang3.StringUtils;
+
+import edu.uark.registerapp.commands.employees.helpers.EmployeeHelper;
+import edu.uark.registerapp.models.entities.EmployeeEntity;
+
+public class Employee extends ApiResponse {
     private UUID id;
-    private String employeeID;
-    private String firstName;
-    private String lastName;
-    private String password;
-    private boolean isActive;
-    private int classification;
-    private UUID managerID;
-    private String createdOn;
-    private boolean isInitialEmployee;
-
-    public Employee() {
-        super();
-
-        this.id = new UUID(0, 0);
-        this.employeeID = "";
-        this.firstName = "";
-        this.lastName = "";
-        this.password = "";
-        this.isActive = true;
-        this.classification = -1;
-        this.managerID = new UUID(0, 0);
-        this.isInitialEmployee = false;
+    public UUID getId() {
+    	return this.id;
     }
+    public Employee setId(final UUID id) {
+		this.id = id;
+		return this;
+	}
 
-    // Get Functions
+	private String employeeId;
+	public String getEmployeeId() {
+		return this.employeeId;
+	}
+	public Employee setEmployeeId(final int employeeId) {
+		this.employeeId = EmployeeHelper.padEmployeeId(employeeId);
+		return this;
+	}
+	public Employee setEmployeeId(final String employeeId) {
+		this.employeeId = employeeId;
+		return this;
+	}
 
-    public UUID getID() {
-        return this.id;
-    }
+	private String firstName;
+	public String getFirstName() {
+		return this.firstName;
+	}
+	public Employee setFirstName(final String firstName) {
+		this.firstName = firstName;
+		return this;
+	}
 
-    public String getEmployeeID() {
-        return this.employeeID;
-    }
+	private String lastName;
+	public String getLastName() {
+		return this.lastName;
+	}
+	public Employee setLastName(final String lastName) {
+		this.lastName = lastName;
+		return this;
+	}
 
-    public String getFirstName() {
-        return this.firstName;
-    }
+	private String password;
+	public String getPassword() {
+		return this.password;
+	}
+	public Employee setPassword(final String password) {
+		this.password = password;
+		return this;
+	}
 
-    public String getLastName() {
-        return this.lastName;
-    }
+	private boolean isActive;
+	public boolean getIsActive() {
+		return this.isActive;
+	}
+	public Employee setIsActive(final boolean isActive) {
+		this.isActive = isActive;
+		return this;
+	}
 
-    public String getPassword() {
-        return this.password;
-    }
+	private int classification;
+	public int getClassification() {
+		return this.classification;
+	}
+	public Employee setClassification(final int classification) {
+		this.classification = classification;
+		return this;
+	}
 
-    public boolean getIsActive() {
-        return this.isActive;
-    }
+	private UUID managerId;
+	public UUID getManagerId() {
+		return this.managerId;
+	}
+	public Employee setManagerId(final UUID managerId) {
+		this.managerId = managerId;
+		return this;
+	}
 
-    public int getClassification() {
-        return this.classification;
-    }
+	private String createdOn;
+	public String getCreatedOn() {
+		return this.createdOn;
+	}
+	public Employee setCreatedOn(final String createdOn) {
+		this.createdOn = createdOn;
+		return this;
+	}
+	public Employee setCreatedOn(final LocalDateTime createdOn) {
+		this.createdOn =
+			createdOn.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
 
-    public UUID getManagerID() {
-        return this.managerID;
-    }
+		return this;
+	}
 
-    public String getCreatedOn() {
-        return this.createdOn;
-    }
+	private boolean isInitialEmployee;
+	public boolean getIsInitialEmployee() {
+		return this.isInitialEmployee;
+	}
+	public Employee setIsInitialEmployee(final boolean isInitialEmployee) {
+		this.isInitialEmployee = isInitialEmployee;
+		return this;
+	}
 
-    public boolean getIsInitialEmployee() {
-        return this.isInitialEmployee;
-    }
+	public Employee() {
+		super();
 
-    // Set Functions
+		this.isActive = true;
+		this.id = new UUID(0, 0);
+		this.classification = -1;
+		this.isInitialEmployee = false;
+		this.managerId = new UUID(0, 0);
+		this.lastName = StringUtils.EMPTY;
+		this.password = StringUtils.EMPTY;
+		this.firstName = StringUtils.EMPTY;
+		this.employeeId = StringUtils.EMPTY;
 
-    public Employee setID(final UUID id) {
-        this.id = id;
-        return this;
-    }
+		this.setCreatedOn(LocalDateTime.now());
+	}
 
-    public Employee setEmployeeID(final String employeeID) {
-        this.employeeID = employeeID;
-        return this;
-    }
+	public Employee(final EmployeeEntity employeeEntity) {
+		super(false);
 
-    public Employee setFirstName(final String firstName) {
-        this.firstName = firstName;
-        return this;
-    }
+		this.isInitialEmployee = false;
+		this.id = employeeEntity.getId();
+		this.password = StringUtils.EMPTY;
+		this.isActive = employeeEntity.getIsActive();
+		this.lastName = employeeEntity.getLastName();
+		this.firstName = employeeEntity.getFirstName();
+		this.managerId = employeeEntity.getManagerId();
+		this.classification = employeeEntity.getClassification();
+		this.employeeId =
+			EmployeeHelper.padEmployeeId(employeeEntity.getEmployeeId());
 
-    public Employee setLastName(final String lastName) {
-        this.lastName = lastName;
-        return this;
-    }
-
-    public Employee setPassword(final String password) {
-        this.password = password;
-        return this;
-    }
-
-    public Employee setIsActive(final boolean isActive) {
-        this.isActive = isActive;
-        return this;
-
-    }
-
-    public Employee setClassification(final int classification) {
-        this.classification = classification
-        return this;
-    }
-
-    public Employee setManagerID(final UUID managerID) {
-        this.managerID = managerID;
-        return this;
-    }
-
-    public Employee setCreatedOn(final String createdOn) {
-        this.createdOn = createdOn;
-        return this;
-    }
-
-    public Employee setIsInitialEmployee(final boolean isInitialEmployee) {
-        this.isInitialEmployee = isInitialEmployee;
-        return this;
-    }
-
+		this.setCreatedOn(employeeEntity.getCreatedOn());
+	}
 }
