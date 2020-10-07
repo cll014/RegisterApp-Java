@@ -19,16 +19,32 @@ import edu.uark.registerapp.controllers.enums.ViewModelNames;
 import edu.uark.registerapp.controllers.enums.ViewNames;
 import edu.uark.registerapp.models.api.Employee;
 import edu.uark.registerapp.models.entities.ActiveUserEntity;
+import edu.uark.registerapp.commands.employees.ActiveEmployeeExistsQuery;
 
 @Controller
 @RequestMapping(value = "/employeeDetail")
 public class EmployeeDetailRouteController extends BaseRouteController{
-    @RequestMapping(method = RequestMethod.GET)
+
     public ModelAndView start(
             @RequestParam final Map<String, String> queryParameters,
             final HttpServletRequest request
+
             ) {
-        if (this.activeUserExists())
+        Optional<ActiveUserEntity> user = this.getCurrentUser(request);
+
+        if (user.isPresent()) {     // checks if active user exists
+            if (!this.activeUserExists() || isElevatedUser(user.get())) {   // Checks if Employee exists or if user is elevated
+                return this.buildStartResponse(!activeUserExists, queryParameters);  // Employee Detail View
+            }
+        }
+        else if (!user.isPresent())  // runs if no active user is present
+        {
+            return this.buildInvalidSessionResponse();
+        }
+        else
+        {
+            return this.buildInvalidSessionResponse();
+        }
 
         return new ModelAndView(ViewModelNames.EMPLOYEE_TYPES.getValue());
     }
@@ -41,5 +57,24 @@ public class EmployeeDetailRouteController extends BaseRouteController{
     ) {
         // TODO
     return new ModelAndView(ViewModelNames.EMPLOYEE_TYPES.getValue());
+    }
+
+    private boolean activeUserExists() {
+        // TODO: Helper method to determine if any active users Exist
+        if(ActiveEmployeeExistsQuery.exists())
+            return true;
+        else
+            return false;
+    }
+
+    private ModelAndView buildStartResponse(
+            final boolean isInitialEmployee,
+            final Map<String, String> queryParameters
+    ) {
+
+        return this.buildStartResponse(
+                isInitialEmployee,
+                (new UUID(0, 0)),
+                queryParameters);
     }
 }
