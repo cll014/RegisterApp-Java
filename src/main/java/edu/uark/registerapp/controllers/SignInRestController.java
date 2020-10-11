@@ -18,8 +18,8 @@ import edu.uark.registerapp.models.api.ApiResponse;
 public class SignInRestController extends BaseRestController{
   //Delete Request
   @RequestMapping(value = "/signOut", method = RequestMethod.DELETE)
-  public @ResponseBosy ApiResponse removeActiveUser(final HttpServletRequest request){
-      //remove any recond in the activeuser table associated with the current session ID
+  public @ResponseBody ApiResponse removeActiveUser(final HttpServletRequest request){
+      //remove any record in the activeuser table associated with the current session ID
     this.activeUserDeleteCommand.setSessionKey(request.getSession().getId()).execute();
     //return and ApiResponse object with the "redirectURL" set appropriately
     return(new ApiResponse()).setRedirectUrl(ViewNames.SIGN_IN.getRoute());
