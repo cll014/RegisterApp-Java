@@ -1,6 +1,6 @@
-  
 package edu.uark.registerapp.commands.employees;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +13,9 @@ import edu.uark.registerapp.models.entities.EmployeeEntity;
 import edu.uark.registerapp.models.repositories.EmployeeRepository;
 
 public class EmployeeQuery implements ResultCommandInterface<Employee>{
+    @Override
     public Employee execute(){
-        EmployeeEntity employeeEntity = this.employeeRespoitory.findById(this.employeeId);
+        final Optional<EmployeeEntity> employeeEntity = this.employeeRepository.findById(this.employeeId);
         if(employeeEntity.isPresent()){
             return new Employee(employeeEntity.get());
         }

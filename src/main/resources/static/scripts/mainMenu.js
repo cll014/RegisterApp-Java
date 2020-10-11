@@ -1,8 +1,8 @@
 document.addEventListener<"DOMContentLoaded", () =>
 {
-    getTransactionIdElement().addEventListener("click", transActionClick); 
-    getProductListIdElement().addEventListener("click", productActionClick);  
-    getEmployeeCreateIdElement().addEventListener("click", empCreateActionClick); 
+    getTransactionIdElement().addEventListener("click", transActionClick);
+    getProductListIdElement().addEventListener("click", productActionClick);
+    getEmployeeCreateIdElement().addEventListener("click", empCreateActionClick);
     getEmployeeDetailsIdElement().addEventListener("click", empDetailsActionClick);
     getReportIdElement().addEventListener("click", reportActionClick);
 }
@@ -58,4 +58,3 @@ function getCashierSalesReportIdElement()
 {
     return document.getElementById("cashierSalesReportButton");
 }
-

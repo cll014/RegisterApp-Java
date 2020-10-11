@@ -95,7 +95,7 @@ function completeSaveAction(callbackResponse){
         return;
     }
     displayEmployeeSavedAlertModel();
-    
+
     const employeeEmployeeIdElement = getEmployeeEmployeeIdElement();
     const employeeEmployeeIdRowElement = employeeEmployeeIdElement.closest("tr");
     if(employeeEmployeeIdRowElement.classList.contains("hidden")){

@@ -1,3 +1,6 @@
+package edu.uark.registerapp.commands.employees;
+
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
@@ -35,13 +38,13 @@ public class EmployeeUpdateCommand {
     }
 
     private void updateEmployeeEntity(){
-        EmployeeEntity quriedEmployeeEntity = this.employeeRepository.findbyId(this.employeeId);
+        Optional<EmployeeEntity> queriedEmployeeEntity = this.employeeRepository.findById(this.employeeId);
         if(!queriedEmployeeEntity.isPresent()){
             throw new NotFoundException("Employee"); // No record with the assoicated record ID exists in the database
         }
 
-        this.apiEmployee = quriedEmployeeEntity.get().synchronize(this.apiEmployee); // Synchronize any incoming changes for UPDATE to the database.
-        this.employeeRepository.save(quriedEmployeeEntity.get()); // Write, via an UPDATE, any changes to the database.
+        this.apiEmployee = queriedEmployeeEntity.get().synchronize(this.apiEmployee); // Synchronize any incoming changes for UPDATE to the database.
+        this.employeeRepository.save(queriedEmployeeEntity.get()); // Write, via an UPDATE, any changes to the database.
     }
 
     // Properties
