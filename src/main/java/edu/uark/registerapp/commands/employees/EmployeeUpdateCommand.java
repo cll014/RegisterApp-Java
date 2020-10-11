@@ -17,6 +17,7 @@ import edu.uark.registerapp.models.entities.EmployeeEntity;
 import edu.uark.registerapp.models.enums.EmployeeClassification;
 import edu.uark.registerapp.models.repositories.EmployeeRepository;
 
+@Service
 public class EmployeeUpdateCommand {
     public Employee execute(){
         this.validProperties();
