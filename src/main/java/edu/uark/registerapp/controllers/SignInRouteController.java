@@ -22,46 +22,68 @@ import edu.uark.registerapp.models.api.EmployeeSignIn;
 
 @Controller
 @RequestMapping(value = "/")
-public class SignInRouteController extends BaseRouteController{
+public class SignInRouteController extends BaseRouteController {
     @RequestMapping(method = RequestMethod.GET)
-    public ViewAndDocument ViewAndDocument(@RequestParam final Map<String, String> queryParameters){
-        //Functionality
-        //if employee exists
-        try{
-          this.activeEmployeeExistsQuery.execit();
-        }catch(NotFoundException e){
-          //if no employee exists
-          return new ModelAndView(REDIRECT_PREPEND.concat(ViewNames.EMPLOYEE_DETAIL.getRoute()));
+    public ModelAndView showSignIn(
+            @RequestParam final Map<String, String> queryParameters
+    ) {
+
+        try {
+            this.activeEmployeeExistsQuery.execute();
+        } catch (NotFoundException e) {
+            return new ModelAndView(
+                    REDIRECT_PREPEND.concat(
+                            ViewNames.EMPLOYEE_DETAIL.getRoute()));
         }
-        ViewAndDocument viewAndDocument = this.setErrorMessageFromQueryString(
-          new ModelAndView(ViewName.SIGN_IN.getViewName()), queryParameters);
-        if(queryParameters.containsKey(QueryParametersNames.EMPLOYEE_ID.getValue())){
-          viewAndDocument.addObject(ViewModelNames.EMPLOYEE_ID.getValue(), queryParameters.get(
-            QueryParametersNames.EMPLOYEE_ID.getValue()));
+
+        ModelAndView modelAndView =
+                this.setErrorMessageFromQueryString(
+                        new ModelAndView(ViewNames.SIGN_IN.getViewName()),
+                        queryParameters);
+
+        if (queryParameters.containsKey(QueryParameterNames.EMPLOYEE_ID.getValue())) {
+            modelAndView.addObject(
+                    ViewModelNames.EMPLOYEE_ID.getValue(),
+                    queryParameters.get(QueryParameterNames.EMPLOYEE_ID.getValue()));
         }
+
+        return modelAndView;
     }
-    return viewAndDocument;
-  }
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ViewAndDocument performSignIn(EmployeeSignIn employeeSignIn, HttpServletRequest request){
-      //Verify Employee Credentials
-      try{
-        //create record
-        this.emloyeeSignInCommand.setSessionId(request.getSession.getId())
-          .setEmployeeSignIn(employeeSignIn).execute();
-      }catch (Exception e){
-        ViewAndDocument viewAndDocument = new ViewAndDocument(ViewNames.SIGN_IN.getViewName());
-        viewAndDocument.addObject(ViewModelNames.ERROR_MESSAGE.getValue(), e.getMessage());
-        viewAndDocument.addObject(ViewModelNames.EMPLOYEE_ID.getValue(), employeeSignIn.getEmployeeId());
-        return viewAndDocument;
-      }
-      //redirect to Main Menu
-      return new ViewAndDocument(REDIRECT_PREPEND.concat(ViewName.MAIN_MENU.getRoute()));
+    public ModelAndView performSignIn(
+            EmployeeSignIn employeeSignIn,
+            HttpServletRequest request
+    ) {
+
+        try {
+            this.employeeSignInCommand
+                    .setSessionId(request.getSession().getId())
+                    .setEmployeeSignIn(employeeSignIn)
+                    .execute();
+        } catch (Exception e) {
+            ModelAndView modelAndView =
+                    new ModelAndView(ViewNames.SIGN_IN.getViewName());
+
+            modelAndView.addObject(
+                    ViewModelNames.ERROR_MESSAGE.getValue(),
+                    e.getMessage());
+            modelAndView.addObject(
+                    ViewModelNames.EMPLOYEE_ID.getValue(),
+                    employeeSignIn.getEmployeeId());
+
+            return modelAndView;
+        }
+
+        return new ModelAndView(
+                REDIRECT_PREPEND.concat(
+                        ViewNames.MAIN_MENU.getRoute()));
     }
 
-@Autowired
-private EmployeeSignInCommand EmployeeSignInCommand;
+    // Properties
+    @Autowired
+    private EmployeeSignInCommand employeeSignInCommand;
 
-@Autowired
-private ActiveEmployeeExistsQuery activeEmployeeExistsQuery;
+    @Autowired
+    private ActiveEmployeeExistsQuery activeEmployeeExistsQuery;
+}
