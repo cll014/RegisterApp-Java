@@ -8,6 +8,7 @@ import edu.uark.registerapp.commands.exceptions.NotFoundException;
 import edu.uark.registerapp.models.repositories.EmployeeRepository;
 
 //define class
+@Service
 public class ActiveEmployeeExistsQuery implements VoidCommandInterface{
     
     @Override
