@@ -31,7 +31,7 @@ public class ProductListingRouteController extends BaseRouteController{
 
 		ModelAndView modelAndView = this.setErrorMessageFromQueryString(
 			new ModelAndView(ViewNames.PRODUCT_LISTING.getViewName()), queryParameters);
-		modelAndView.addObject(ViewModelNames.IS_ELEVATED_USER.getValue(), this.isElevatedUser(activeuserEntity.get()));
+		modelAndView.addObject(ViewModelNames.IS_ELEVATED_USER.getValue(), this.isElevatedUser(activeUserEntity.get()));
 		
 		try {
 			modelAndView.addObject(
