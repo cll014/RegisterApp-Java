@@ -15,6 +15,8 @@ import edu.uark.registerapp.controllers.enums.ViewModelNames;
 import edu.uark.registerapp.controllers.enums.ViewNames;
 import edu.uark.registerapp.models.entities.ActiveUserEntity;
 
+@Controller
+@RequestMapping(value = "/mainMenu")
 public class MainMenuRouteController extends BaseRouteController{
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView start(
@@ -22,7 +24,7 @@ public class MainMenuRouteController extends BaseRouteController{
             final HttpServletRequest request
     ) {
 
-        Optional<ActiveUserEntity> activeUserEntity = this.getCurrentUser(request);
+        final Optional<ActiveUserEntity> activeUserEntity = this.getCurrentUser(request);
         if (!activeUserEntity.isPresent()) {
             return this.buildInvalidSessionResponse();
         }
