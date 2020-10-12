@@ -21,7 +21,7 @@ import edu.uark.registerapp.models.api.Employee;
 @Table(name="employee")
 public class EmployeeEntity {
     @Id
-    @Column(name="record_id", updatable = false)
+    @Column(name="id", updatable = false)
     @GeneratedValue(strategy=GenerationType.AUTO)
     private final UUID id;
 
@@ -29,7 +29,7 @@ public class EmployeeEntity {
 		return this.id;
 	}
 
-	@Column(name = "employee_id", insertable = false, updatable = false)
+	@Column(name = "employeeid", insertable = false, updatable = false)
 	@Generated(GenerationTime.INSERT)
 	private int employeeId;
 
@@ -37,7 +37,7 @@ public class EmployeeEntity {
 		return this.employeeId;
 	}
 
-	@Column(name = "first_name")
+	@Column(name = "firstname")
 	private String firstName;
 
 	public String getFirstName() {
@@ -49,7 +49,7 @@ public class EmployeeEntity {
 		return this;
 	}
 
-	@Column(name = "last_name")
+	@Column(name = "lastname")
 	private String lastName;
 
 	public String getLastName() {
@@ -97,7 +97,7 @@ public class EmployeeEntity {
 		return this;
 	}
 
-	@Column(name = "manager_id")
+	@Column(name = "manager")
 	private UUID managerId;
 
 	public UUID getManagerId() {
@@ -109,7 +109,7 @@ public class EmployeeEntity {
 		return this;
 	}
 
-	@Column(name = "created_on", insertable = false, updatable = false)
+	@Column(name = "createdon", insertable = false, updatable = false)
 	@Generated(GenerationTime.INSERT)
 	private LocalDateTime createdOn;
 
