@@ -36,7 +36,7 @@ public class EmployeeRestController extends BaseRestController {
         ApiResponse createResponse;
 
         if (employeeExists) {
-            this.activeEmployeeExistsQuery.execute()
+            this.activeEmployeeExistsQuery.execute();
             createResponse = this.redirectUserNotElevated(request, response);
         }
         else {
