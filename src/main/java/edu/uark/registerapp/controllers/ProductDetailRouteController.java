@@ -26,34 +26,36 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping(value = "/productDetail")
 public class ProductDetailRouteController extends BaseRouteController{
 	@RequestMapping(method = RequestMethod.GET)
-	public ModelAndView start(@RequestParam Map<String, String> queryParameters, HttpServletRequest request) {
-		Optional<ActiveUserEntity> user = this.getCurrentUser(request);
+	public ModelAndView start(@RequestParam Map<String, String> queryParameters, final HttpServletRequest request) {
+		final Optional<ActiveUserEntity> user = this.getCurrentUser(request);
 
 		if(!user.isPresent()) {
 			return this.buildInvalidSessionResponse();
 		}
-		else if (!isElevatedUser(user.get())){
+		else if (!this.isElevatedUser(user.get())){
 			return this.buildNoPermissionsResponse(ViewNames.PRODUCT_LISTING.getRoute());
 		}
-		else {
-			ModelAndView modelAndView = this.setErrorMessageFromQueryString(new ModelAndView(ViewNames.PRODUCT_DETAIL.getViewName()), queryParameters);
-			modelAndView.addObject(ViewModelNames.IS_ELEVATED_USER.getValue(), true);
-			modelAndView.addObject(ViewModelNames.PRODUCT.getValue(), (new Product()).setLookupCode(StringUtils.EMPTY).setCount(0));
+	
+		final ModelAndView modelAndView = this.setErrorMessageFromQueryString(new ModelAndView(ViewNames.PRODUCT_DETAIL.getViewName()), queryParameters);
+		modelAndView.addObject(ViewModelNames.IS_ELEVATED_USER.getValue(), true);
+		modelAndView.addObject(ViewModelNames.PRODUCT.getValue(), (new Product()).setLookupCode(StringUtils.EMPTY).setCount(0));
 
-			return modelAndView;
-		}
+		return modelAndView;
+
 	}
 
 	@RequestMapping(value = "/{productId}", method = RequestMethod.GET)
-	public ModelAndView startWithProduct(@PathVariable final UUID productId, @RequestParam Map<String, String> queryParameters, HttpServletRequest request) {
-		Optional<ActiveUserEntity> user = this.getCurrentUser(request);
+	public ModelAndView startWithProduct(@PathVariable final UUID productId, @RequestParam Map<String, String> queryParameters, final HttpServletRequest request) {
+		final Optional<ActiveUserEntity> user = this.getCurrentUser(request);
 
 
 		if (!user.isPresent()) {
 			return this.buildInvalidSessionResponse();
-		} else {
-			ModelAndView modelAndView = this.setErrorMessageFromQueryString(new ModelAndView(ViewNames.PRODUCT_DETAIL.getViewName()), queryParameters);
-			modelAndView.addObject(ViewModelNames.IS_ELEVATED_USER.getValue(), EmployeeClassification.isElevatedUser(user.get().getClassification()));
+		} 
+		
+		fianl ModelAndView modelAndView = this.setErrorMessageFromQueryString(new ModelAndView(ViewNames.PRODUCT_DETAIL.getViewName()), queryParameters);
+			
+		modelAndView.addObject(ViewModelNames.IS_ELEVATED_USER.getValue(), EmployeeClassification.isElevatedUser(user.get().getClassification()));
 
 			try {
 				modelAndView.addObject(
@@ -72,7 +74,6 @@ public class ProductDetailRouteController extends BaseRouteController{
 
 			return modelAndView;
 
-		}
 	}
 
 	// Properties
