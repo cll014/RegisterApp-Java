@@ -25,10 +25,10 @@
     <div class="inputContent">
         <table id="employeeDetails">
             <tbody>
-            <tr>
+            <tr class="hidden">
                 <td>ID:</td>
                 <td>
-                    <input id="employeeId" th:value="${!employee.isEmpty} ? ${employee.id} : ''" />
+                    <input id="employeeId" type="hidden" th:value="${!employee.isEmpty} ? ${employee.id} : ''" />
                 </td>
             </tr>
             <tr class="hidden">
@@ -101,5 +101,3 @@
 </div>
 
 </body>
-
-</html>
