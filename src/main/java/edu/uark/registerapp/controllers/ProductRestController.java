@@ -26,8 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 public class ProductRestController extends BaseRestController {
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public @ResponseBody ApiResponse createProduct(
-		@RequestBody final Product product,  HttpServletRequest request,
-		 HttpServletResponse response
+		@RequestBody final Product product,  final HttpServletRequest request,
+		 final HttpServletResponse response
 	) {
 
 		final ApiResponse elevatedUserResponse =
