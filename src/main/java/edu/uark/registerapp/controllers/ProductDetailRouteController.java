@@ -53,7 +53,7 @@ public class ProductDetailRouteController extends BaseRouteController{
 			return this.buildInvalidSessionResponse();
 		} 
 		
-		fianl ModelAndView modelAndView = this.setErrorMessageFromQueryString(new ModelAndView(ViewNames.PRODUCT_DETAIL.getViewName()), queryParameters);
+		final ModelAndView modelAndView = this.setErrorMessageFromQueryString(new ModelAndView(ViewNames.PRODUCT_DETAIL.getViewName()), queryParameters);
 			
 		modelAndView.addObject(ViewModelNames.IS_ELEVATED_USER.getValue(), EmployeeClassification.isElevatedUser(user.get().getClassification()));
 
