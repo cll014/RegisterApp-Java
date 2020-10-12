@@ -15,10 +15,10 @@ import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.GenerationTime;
 
 @Entity
-@Table(name="active_user")
+@Table(name="activeuser")
 public class ActiveUserEntity {
     @Id
-    @Column(name="record_id", updatable = false)
+    @Column(name="id", updatable = false)
     @GeneratedValue(strategy=GenerationType.AUTO)
     private final UUID id;
 
@@ -26,7 +26,7 @@ public class ActiveUserEntity {
 		return this.id;
 	}
 
-	@Column(name = "employee_id")
+	@Column(name = "employeeid")
 	private UUID employeeId;
 
 	public UUID getEmployeeId() {
@@ -62,7 +62,7 @@ public class ActiveUserEntity {
 		return this;
 	}
 
-	@Column(name = "session_key")
+	@Column(name = "sessionkey")
 	private String sessionKey;
 
 	public String getSessionKey() {
@@ -74,7 +74,7 @@ public class ActiveUserEntity {
     	return this;
     }
 
-    @Column(name="created_on", insertable=false, updatable = false)
+    @Column(name="createdon", insertable=false, updatable = false)
     @Generated(GenerationTime.INSERT)
 	private LocalDateTime createdOn;
 	public LocalDateTime getCreatedOn() {
