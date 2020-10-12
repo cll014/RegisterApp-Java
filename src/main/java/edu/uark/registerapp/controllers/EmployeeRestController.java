@@ -30,12 +30,13 @@ import edu.uark.registerapp.models.api.Employee;
 public class EmployeeRestController extends BaseRestController {
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public @ResponseBody
-    ApiResponse createEmployee(@RequestBody Employee employee, HttpServletRequest request, HttpServletResponse response) {
+    ApiResponse createEmployee(@RequestBody Employee employee, final HttpServletRequest request, final HttpServletResponse response) {
         final boolean employeeExists = this.activeUserExists(); // Active Employee Exists
         boolean isInit = false;
         ApiResponse createResponse;
 
         if (employeeExists) {
+            this.activeEmployeeExistsQuery.execute()
             createResponse = this.redirectUserNotElevated(request, response);
         }
         else {
@@ -46,25 +47,24 @@ public class EmployeeRestController extends BaseRestController {
         if (!createResponse.getRedirectUrl().equals(StringUtils.EMPTY)) {
             return createResponse;
         }
-        else {
-            Employee newEmployee = this.employeeCreateCommand.setApiEmployee(employee).setIsInitialEmployee(employeeExists).execute();
-            if(isInit) {
+        
+        final Employee newEmployee = this.employeeCreateCommand.setApiEmployee(employee).setIsInitialEmployee(employeeExists).execute();
+        
+        if(isInit) {
                 newEmployee.setRedirectUrl(ViewNames.SIGN_IN.getRoute().concat(
                         this.buildInitialQueryParameter(QueryParameterNames.EMPLOYEE_ID.getValue(), newEmployee.getEmployeeId())));
-            }
-            return newEmployee.setIsInitialEmployee(isInit);
         }
+        return newEmployee.setIsInitialEmployee(isInit);
+
     }
     @RequestMapping(value = "/{employeeId}", method = RequestMethod.PATCH)
-    public @ResponseBody ApiResponse updateEmployee(@PathVariable UUID employeeId, @RequestBody Employee employee, HttpServletResponse response, HttpServletRequest request) {
-        ApiResponse createResponse = this.redirectUserNotElevated(request, response);
+    public @ResponseBody ApiResponse updateEmployee(@PathVariable final UUID employeeId, @RequestBody final Employee employee, final HttpServletResponse response, final HttpServletRequest request) {
+        final ApiResponse createResponse = this.redirectUserNotElevated(request, response);
 
         if(!createResponse.getRedirectUrl().equals(StringUtils.EMPTY)) {
             return createResponse;
         }
-        else {
             return this.employeeUpdateCommand.setEmployeeId(employeeId).setApiEmployee(employee).execute();
-        }
     }
 
     private boolean activeUserExists() {
