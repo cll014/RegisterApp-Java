@@ -29,9 +29,10 @@ public class ProductListingRouteController extends BaseRouteController{
 			return buildInvalidSessionResponse();
 		}
 
-		ModelAndView modelAndView =
-			new ModelAndView(ViewNames.PRODUCT_LISTING.getViewName());
-
+		ModelAndView modelAndView = this.setErrorMessageFromQueryString(
+			new ModelAndView(ViewNames.PRODUCT_LISTING.getViewName()), queryParameters);
+		modelAndView.addObject(ViewModelNames.IS_ELEVATED_USER.getValue(), this.isElevatedUser(activeuserEntity.get()));
+		
 		try {
 			modelAndView.addObject(
 				ViewModelNames.PRODUCTS.getValue(),
