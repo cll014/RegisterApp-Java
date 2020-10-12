@@ -63,15 +63,27 @@ public class EmployeeDetailRouteController extends BaseRouteController{
     public ModelAndView startWithEmployee(@PathVariable final UUID employeeId, @RequestParam final Map<String, String> queryParameters, final HttpServletRequest request) {
         Optional<ActiveUserEntity> user = this.getCurrentUser(request); // Current user
 
-        if (!user.isPresent()) {
+        final Optional<ActiveUserEntity> activeUserEntity =
+                this.getCurrentUser(request);
+
+        if (!activeUserEntity.isPresent()) {
             return this.buildInvalidSessionResponse();
-        }
-        else if (!isElevatedUser(user.get())) {
+        } else if (!this.isElevatedUser(activeUserEntity.get())) {
             return this.buildNoPermissionsResponse();
         }
-        else {
-            return this.buildStartResponse(employeeId, queryParameters);
-        }
+
+        return this.buildStartResponse(employeeId, queryParameters);
+
+
+//        if (!user.isPresent()) {
+//            return this.buildInvalidSessionResponse();
+//        }
+//        else if (!isElevatedUser(user.get())) {
+//            return this.buildNoPermissionsResponse();
+//        }
+//        else {
+//            return this.buildStartResponse(employeeId, queryParameters);
+//        }
     }
 
     private boolean activeUserExists() {
