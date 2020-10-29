@@ -10,17 +10,17 @@ public class EmployeeHelper {
 		final String employeeIdAsString = Integer.toString(employeeId);
 
 		return ((employeeIdAsString.length() < EMPLOYEE_ID_MAXIMUM_LENGTH)
-				? StringUtils.leftPad(
+			? StringUtils.leftPad(
 				employeeIdAsString,
 				EMPLOYEE_ID_MAXIMUM_LENGTH,
 				"0")
-				: employeeIdAsString);
+			: employeeIdAsString);
 	}
 
 	public static byte[] hashPassword(final String password) {
 		try {
 			final MessageDigest messageDigest =
-					MessageDigest.getInstance("SHA-256");
+				MessageDigest.getInstance("SHA-256");
 
 			messageDigest.update(password.getBytes());
 
@@ -29,6 +29,6 @@ public class EmployeeHelper {
 			return new byte[0];
 		}
 	}
-
+	
 	private static final int EMPLOYEE_ID_MAXIMUM_LENGTH = 5;
 }

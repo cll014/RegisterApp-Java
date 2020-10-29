@@ -2,6 +2,7 @@ package edu.uark.registerapp.commands.employees;
 
 import java.util.Arrays;
 import java.util.Optional;
+
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +13,6 @@ import edu.uark.registerapp.commands.ResultCommandInterface;
 import edu.uark.registerapp.commands.employees.helpers.EmployeeHelper;
 import edu.uark.registerapp.commands.exceptions.UnauthorizedException;
 import edu.uark.registerapp.commands.exceptions.UnprocessableEntityException;
-
 import edu.uark.registerapp.models.api.Employee;
 import edu.uark.registerapp.models.api.EmployeeSignIn;
 import edu.uark.registerapp.models.entities.ActiveUserEntity;
@@ -20,95 +20,89 @@ import edu.uark.registerapp.models.entities.EmployeeEntity;
 import edu.uark.registerapp.models.repositories.ActiveUserRepository;
 import edu.uark.registerapp.models.repositories.EmployeeRepository;
 
-//define class
 @Service
-public class EmployeeSignInCommand implements ResultCommandInterface<Employee>{
-    //Properties
-    //employee signIn object
-    private EmployeeSignIn employeeSignIn;
-    public EmployeeSignIn getEmployeeSignIn(){
-        return this.employeeSignIn;
-    }
-    public EmployeeSignInCommand setEmployeeSignIn(final EmployeeSignIn employeeSignIn){
-        this.employeeSignIn = employeeSignIn;
-        return this;
-    }
+public class EmployeeSignInCommand implements ResultCommandInterface<Employee> {
+	@Override
+	public Employee execute() {
+		this.validateProperties();
 
+		return new Employee(this.SignInEmployee());
+	}
 
-    //current sessionId
-    private String sessionId;
-    public String getSessionID(){
-        return this.sessionId;
-    }
-    public EmployeeSignInCommand setSessionId(final String sessionId){
-        this.sessionId = sessionId;
-        return this;
-    }
+	// Helper methods
+	private void validateProperties() {
+		if (StringUtils.isBlank(this.employeeSignIn.getEmployeeId())) {
+			throw new UnprocessableEntityException("employee ID");
+		}
+		try {
+			Integer.parseInt(this.employeeSignIn.getEmployeeId());
+		} catch (final NumberFormatException e) {
+			throw new UnprocessableEntityException("employee ID");
+		}
+		if (StringUtils.isBlank(this.employeeSignIn.getPassword())) {
+			throw new UnprocessableEntityException("password");
+		}
+	}
 
-    //Functionality
-    //validate the incoming Employee request object
-    @Override
-    public Employee execute(){
-        this.validateProperties();
-        return new Employee(this.SignInEmployee());
-    }
+	@Transactional
+	private EmployeeEntity SignInEmployee() {
+		final Optional<EmployeeEntity> employeeEntity =
+			this.employeeRepository.findByEmployeeId(
+				Integer.parseInt(this.employeeSignIn.getEmployeeId()));
 
-    //validate the incoming Employee request object
-    private void validateProperties(){
-        //error if employeeID is blank
-        if (StringUtils.isBlank(this.employeeSignIn.getEmployeeId())){
-            throw new UnprocessableEntityException("employee ID");
-        }
-        //error if employee ID is not a number
-        try{
-            Integer.parseInt(this.employeeSignIn.getEmployeeId());
-        } catch(final NumberFormatException e){
-            throw new UnprocessableEntityException("employee ID");
-        }
-        //error if password is blank
-        if(StringUtils.isBlank(this.employeeSignIn.getPassword())){
-            throw new UnprocessableEntityException("password");
-        }
+		if (!employeeEntity.isPresent()
+			|| !Arrays.equals(
+				employeeEntity.get().getPassword(),
+				EmployeeHelper.hashPassword(this.employeeSignIn.getPassword()))
+		) {
 
-    }
-    //query the employee by employee ID
-    @Transactional
-    EmployeeEntity SignInEmployee(){
-        //use the EmployeeRepository.queryByEmployeeId()
-        final Optional<EmployeeEntity> employeeEntity = this.employeeRepository.findByEmployeeId(
-                                                            Integer.parseInt(this.employeeSignIn.getEmployeeId()));
-        //verify the employee exists
-        if(!employeeEntity.isPresent() || !Arrays.equals(
-                                            employeeEntity.get().getPassword(),
-                                            EmployeeHelper.hashPassword(this.employeeSignIn.getPassword()))){
-            throw new UnauthorizedException();
-        }
-        //query activeUser table for a record with the employee ID
-        final Optional<ActiveUserEntity> activeUserEntity = this.activeUserRepository.findByEmployeeId(
-                                                                employeeEntity.get().getId());
-        //is user exists 
-        if(activeUserEntity.isPresent()){
-            //update entity's sessionKey property with the current session key
-            //use the ActiveUserRepository.save()
-            this.activeUserRepository.save(activeUserEntity.get().setSessionKey(this.sessionId));
-        }
-        else{
-            //create new active user
-            //set the session key
-            //set the necessary employee details
-            //use the ActiveUserRepository.save()
-            this.activeUserRepository.save(
-                new ActiveUserEntity()).setSessionKey(this.sessionId).setEmployeeId(
-                    employeeEntity.get().getId()).setClassification(employeeEntity.get().getClassification()).setName(
-                        employeeEntity.get().getFirstName().concat(" ").concat(employeeEntity.get().getLastName()));
+			throw new UnauthorizedException();
+		}
 
-        }
-        return employeeEntity.get();
-        
-    }
+		final Optional<ActiveUserEntity> activeUserEntity =
+			this.activeUserRepository
+				.findByEmployeeId(employeeEntity.get().getId());
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
-    @Autowired 
-    private ActiveUserRepository activeUserRepository;
+		if (!activeUserEntity.isPresent()) {
+			this.activeUserRepository.save(
+					(new ActiveUserEntity())
+						.setSessionKey(this.sessionId)
+						.setEmployeeId(employeeEntity.get().getId())
+						.setClassification(
+							employeeEntity.get().getClassification())
+						.setName(
+							employeeEntity.get().getFirstName()
+								.concat(" ")
+								.concat(employeeEntity.get().getLastName())));
+		} else {
+			this.activeUserRepository.save(
+				activeUserEntity.get().setSessionKey(this.sessionId));
+		}
+
+		return employeeEntity.get();
+	}
+
+	// Properties
+	private EmployeeSignIn employeeSignIn;
+	public EmployeeSignIn getEmployeeSignIn() {
+		return this.employeeSignIn;
+	}
+	public EmployeeSignInCommand setEmployeeSignIn(final EmployeeSignIn employeeSignIn) {
+		this.employeeSignIn = employeeSignIn;
+		return this;
+	}
+
+	private String sessionId;
+	public String getSessionId() {
+		return this.sessionId;
+	}
+	public EmployeeSignInCommand setSessionId(final String sessionId) {
+		this.sessionId = sessionId;
+		return this;
+	}
+
+	@Autowired
+	private EmployeeRepository employeeRepository;
+	@Autowired
+	private ActiveUserRepository activeUserRepository;
 }

@@ -97,7 +97,7 @@ public class EmployeeEntity {
 		return this;
 	}
 
-	@Column(name = "manager")
+	@Column(name = "managerid")
 	private UUID managerId;
 
 	public UUID getManagerId() {

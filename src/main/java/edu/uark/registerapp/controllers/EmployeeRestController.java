@@ -1,12 +1,10 @@
 package edu.uark.registerapp.controllers;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import edu.uark.registerapp.models.entities.ActiveUserEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,61 +26,75 @@ import edu.uark.registerapp.models.api.Employee;
 @RestController
 @RequestMapping(value = "/api/employee")
 public class EmployeeRestController extends BaseRestController {
-    @RequestMapping(value = "/", method = RequestMethod.POST)
-    public @ResponseBody
-    ApiResponse createEmployee(@RequestBody Employee employee, final HttpServletRequest request, final HttpServletResponse response) {
-        final boolean employeeExists = this.activeUserExists(); // Active Employee Exists
-        boolean isInit = false;
-        ApiResponse createResponse;
+	@RequestMapping(value = "/", method = RequestMethod.POST)
+	public @ResponseBody ApiResponse createEmployee(
+		@RequestBody final Employee employee,
+		final HttpServletRequest request,
+		final HttpServletResponse response
+	) {
 
-        if (employeeExists) {
-            this.activeEmployeeExistsQuery.execute();
-            createResponse = this.redirectUserNotElevated(request, response);
-        }
-        else {
-            createResponse = new ApiResponse();
-            isInit = true;
-        }
+		boolean isInitialEmployee = false;
+		ApiResponse canCreateEmployeeResponse;
 
-        if (!createResponse.getRedirectUrl().equals(StringUtils.EMPTY)) {
-            return createResponse;
-        }
-        
-        final Employee newEmployee = this.employeeCreateCommand.setApiEmployee(employee).setIsInitialEmployee(employeeExists).execute();
-        
-        if(isInit) {
-                newEmployee.setRedirectUrl(ViewNames.SIGN_IN.getRoute().concat(
-                        this.buildInitialQueryParameter(QueryParameterNames.EMPLOYEE_ID.getValue(), newEmployee.getEmployeeId())));
-        }
-        return newEmployee.setIsInitialEmployee(isInit);
+		try {
+			this.activeEmployeeExistsQuery.execute();
 
-    }
-    @RequestMapping(value = "/{employeeId}", method = RequestMethod.PATCH)
-    public @ResponseBody ApiResponse updateEmployee(@PathVariable final UUID employeeId, @RequestBody final Employee employee, final HttpServletResponse response, final HttpServletRequest request) {
-        final ApiResponse createResponse = this.redirectUserNotElevated(request, response);
+			canCreateEmployeeResponse =
+				this.redirectUserNotElevated(request, response);
+		} catch (final NotFoundException e) {
+			isInitialEmployee = true;
+			canCreateEmployeeResponse = new ApiResponse();
+		}
 
-        if(!createResponse.getRedirectUrl().equals(StringUtils.EMPTY)) {
-            return createResponse;
-        }
-            return this.employeeUpdateCommand.setEmployeeId(employeeId).setApiEmployee(employee).execute();
-    }
+		if (!canCreateEmployeeResponse.getRedirectUrl().equals(StringUtils.EMPTY)) {
+			return canCreateEmployeeResponse;
+		}
 
-    private boolean activeUserExists() {
-        try {
-            this.activeEmployeeExistsQuery.execute();
-            return true;
-        } catch (final NotFoundException e) {
-            return false;
-        }
+		final Employee createdEmployee =
+			this.employeeCreateCommand
+				.setApiEmployee(employee)
+				.setIsInitialEmployee(isInitialEmployee)
+				.execute();
 
-    }
+		if (isInitialEmployee) {
+			createdEmployee
+				.setRedirectUrl(
+					ViewNames.SIGN_IN.getRoute().concat(
+						this.buildInitialQueryParameter(
+							QueryParameterNames.EMPLOYEE_ID.getValue(),
+							createdEmployee.getEmployeeId())));
+		}
 
-    @Autowired
-    private ActiveEmployeeExistsQuery activeEmployeeExistsQuery;
+		return createdEmployee.setIsInitialEmployee(isInitialEmployee);
+	}
 
-    @Autowired
-    private EmployeeCreateCommand employeeCreateCommand;
+	@RequestMapping(value = "/{employeeId}", method = RequestMethod.PATCH)
+	public @ResponseBody ApiResponse updateEmployee(
+		@PathVariable final UUID employeeId,
+		@RequestBody final Employee employee,
+		final HttpServletRequest request,
+		final HttpServletResponse response
+	) {
 
-    @Autowired
-    private EmployeeUpdateCommand employeeUpdateCommand;
+		final ApiResponse elevatedUserResponse =
+			this.redirectUserNotElevated(request, response);
+		if (!elevatedUserResponse.getRedirectUrl().equals(StringUtils.EMPTY)) {
+			return elevatedUserResponse;
+		}
+
+		return this.employeeUpdateCommand
+			.setEmployeeId(employeeId)
+			.setApiEmployee(employee)
+			.execute();
+	}
+
+	// Properties
+	@Autowired
+	private EmployeeCreateCommand employeeCreateCommand;
+	
+	@Autowired
+	private EmployeeUpdateCommand employeeUpdateCommand;
+	
+	@Autowired
+	private ActiveEmployeeExistsQuery activeEmployeeExistsQuery;
 }

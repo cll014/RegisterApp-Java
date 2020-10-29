@@ -13,28 +13,29 @@ import edu.uark.registerapp.models.entities.EmployeeEntity;
 import edu.uark.registerapp.models.repositories.EmployeeRepository;
 
 @Service
-public class EmployeeQuery implements ResultCommandInterface<Employee>{
-    @Override
-    public Employee execute(){
-        final Optional<EmployeeEntity> employeeEntity = this.employeeRepository.findById(this.employeeId);
-        if(employeeEntity.isPresent()){
-            return new Employee(employeeEntity.get());
-        }
-        else{
-            throw new NotFoundException("Employee");
-        }
-    }
+public class EmployeeQuery implements ResultCommandInterface<Employee> {
+	@Override
+	public Employee execute() {
+		final Optional<EmployeeEntity> employeeEntity =
+			this.employeeRepository.findById(this.employeeId);
 
-    // Properties
-    private UUID employeeId;
-    public UUID getEmployeeID(){
-        return this.employeeId;
-    }
-    public EmployeeQuery setEmployeeId(final UUID employeeId){
-        this.employeeId = employeeId;
-        return this;
-    }
+		if (employeeEntity.isPresent()) {
+			return new Employee(employeeEntity.get());
+		} else {
+			throw new NotFoundException("Employee");
+		}
+	}
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+	// Properties
+	private UUID employeeId;
+	public UUID getEmployeeId() {
+		return this.employeeId;
+	}
+	public EmployeeQuery setEmployeeId(final UUID employeeId) {
+		this.employeeId = employeeId;
+		return this;
+	}
+
+	@Autowired
+	private EmployeeRepository employeeRepository;
 }

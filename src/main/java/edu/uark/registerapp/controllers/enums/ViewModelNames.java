@@ -9,7 +9,7 @@ public enum ViewModelNames {
 	EMPLOYEE_ID("employeeId"), // Sign in
 	EMPLOYEE("employee"), // Employee detail
 	EMPLOYEE_TYPES("employeeTypes");
-
+	
 	public String getValue() {
 		return value;
 	}

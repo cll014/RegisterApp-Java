@@ -18,54 +18,63 @@ import edu.uark.registerapp.models.enums.EmployeeClassification;
 import edu.uark.registerapp.models.repositories.EmployeeRepository;
 
 @Service
-public class EmployeeUpdateCommand {
-    public Employee execute(){
-        this.validProperties();
-        this.updateEmployeeEntity();
-        return this.apiEmployee;
-    }
+public class EmployeeUpdateCommand implements ResultCommandInterface<Employee> {
+	@Override
+	public Employee execute() {
+		this.validateProperties();
+		
+		this.updateEmployeeEntity();
 
-    // Helper Methods
-    private void validProperties(){
-        if(StringUtils.isBlank(this.apiEmployee.getFirstName())){
-            throw new UnprocessableEntityException("First Name");
-        }
-        if(StringUtils.isBlank(this.apiEmployee.getLastName())){
-            throw new UnprocessableEntityException("Last Name");
-        }
-        if(EmployeeClassification.map(this.apiEmployee.getClassification()) == EmployeeClassification.NOT_DEFINED){
-            throw new UnprocessableEntityException("Classification");
-        }
-    }
+		return this.apiEmployee;
+	}
 
-    private void updateEmployeeEntity(){
-        Optional<EmployeeEntity> queriedEmployeeEntity = this.employeeRepository.findById(this.employeeId);
-        if(!queriedEmployeeEntity.isPresent()){
-            throw new NotFoundException("Employee"); // No record with the assoicated record ID exists in the database
-        }
+	// Helper methods
+	private void validateProperties() {
+		if (StringUtils.isBlank(this.apiEmployee.getFirstName())) {
+			throw new UnprocessableEntityException("first name");
+		}
+		if (StringUtils.isBlank(this.apiEmployee.getLastName())) {
+			throw new UnprocessableEntityException("last name");
+		}
+		if (EmployeeClassification.map(this.apiEmployee.getClassification()) == EmployeeClassification.NOT_DEFINED) {
+			throw new UnprocessableEntityException("classification");
+		}
+	}
 
-        this.apiEmployee = queriedEmployeeEntity.get().synchronize(this.apiEmployee); // Synchronize any incoming changes for UPDATE to the database.
-        this.employeeRepository.save(queriedEmployeeEntity.get()); // Write, via an UPDATE, any changes to the database.
-    }
+	@Transactional
+	private void updateEmployeeEntity() {
+		final Optional<EmployeeEntity> queriedEmployeeEntity =
+			this.employeeRepository.findById(this.employeeId);
 
-    // Properties
-    private UUID employeeId;
-    public UUID getEmployeeId(){
-        return this.employeeId;
-    }
-    public EmployeeUpdateCommand setEmployeeId(final UUID employeeId){
-        this.employeeId = employeeId;
-        return this;
-    }
+		if (!queriedEmployeeEntity.isPresent()) {
+			throw new NotFoundException("Employee"); // No record with the associated record ID exists in the database.
+		}
 
-    private Employee apiEmployee;
-    public Employee getApiEmployee(){
-        return this.apiEmployee;
-    }
-    public EmployeeUpdateCommand setApiEmployee(final Employee apiEmployee){
-        this.apiEmployee = apiEmployee;
-        return this;
-    }
+		this.apiEmployee = queriedEmployeeEntity.get()
+			.synchronize(this.apiEmployee); // Synchronize any incoming changes for UPDATE to the database.
 
-    private EmployeeRepository employeeRepository;
+		this.employeeRepository.save(queriedEmployeeEntity.get()); // Write, via an UPDATE, any changes to the database.
+	}
+
+	// Properties
+	private UUID employeeId;
+	public UUID getEmployeeId() {
+		return this.employeeId;
+	}
+	public EmployeeUpdateCommand setEmployeeId(final UUID employeeId) {
+		this.employeeId = employeeId;
+		return this;
+	}
+
+	private Employee apiEmployee;
+	public Employee getApiEmployee() {
+		return this.apiEmployee;
+	}
+	public EmployeeUpdateCommand setApiEmployee(final Employee apiEmployee) {
+		this.apiEmployee = apiEmployee;
+		return this;
+	}
+
+	@Autowired
+	private EmployeeRepository employeeRepository;
 }
