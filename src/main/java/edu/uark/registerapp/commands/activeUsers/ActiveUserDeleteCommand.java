@@ -15,9 +15,10 @@ public class ActiveUserDeleteCommand implements VoidCommandInterface {
 	@Transactional
 	@Override
 	public void execute() {
+		//checks for session key
 		final Optional<ActiveUserEntity> activeUserEntity =
 			this.activeUserRepository.findBySessionKey(this.sessionKey);
-
+		//if active, is removed from active database
 		if (activeUserEntity.isPresent()) {
 			this.activeUserRepository.delete(activeUserEntity.get());
 		}
