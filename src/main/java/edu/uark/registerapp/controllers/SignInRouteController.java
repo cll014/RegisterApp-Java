@@ -27,21 +27,23 @@ public class SignInRouteController extends BaseRouteController {
 	public ModelAndView showSignIn(
 		@RequestParam final Map<String, String> queryParameters
 	) {
-
+		//attempts to find active employee from database
 		try {
 			this.activeEmployeeExistsQuery.execute();
+		//if not found, reroutes
 		} catch (NotFoundException e) {
 			return new ModelAndView(
 				REDIRECT_PREPEND.concat(
 					ViewNames.EMPLOYEE_DETAIL.getRoute()));
 		}
-
+		//error message from model and View object
 		ModelAndView modelAndView =
 			this.setErrorMessageFromQueryString(
 				new ModelAndView(ViewNames.SIGN_IN.getViewName()),
 				queryParameters);
-		
+		//looks for key in the table
 		if (queryParameters.containsKey(QueryParameterNames.EMPLOYEE_ID.getValue())) {
+			//adds an object
 			modelAndView.addObject(
 				ViewModelNames.EMPLOYEE_ID.getValue(),
 				queryParameters.get(QueryParameterNames.EMPLOYEE_ID.getValue()));
@@ -55,16 +57,17 @@ public class SignInRouteController extends BaseRouteController {
 		EmployeeSignIn employeeSignIn,
 		HttpServletRequest request
 	) {
-
+		//try to login
 		try {
 			this.employeeSignInCommand
 				.setSessionId(request.getSession().getId())
 				.setEmployeeSignIn(employeeSignIn)
 				.execute();
 		} catch (Exception e) {
+			//new object
 			ModelAndView modelAndView =
 				new ModelAndView(ViewNames.SIGN_IN.getViewName());
-
+			//adds object to ViewModelNames
 			modelAndView.addObject(
 				ViewModelNames.ERROR_MESSAGE.getValue(),
 				e.getMessage());
