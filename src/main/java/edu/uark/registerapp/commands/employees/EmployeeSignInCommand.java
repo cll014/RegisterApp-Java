@@ -23,13 +23,16 @@ import edu.uark.registerapp.models.repositories.EmployeeRepository;
 @Service
 public class EmployeeSignInCommand implements ResultCommandInterface<Employee> {
 	@Override
+	//validates username and password
 	public Employee execute() {
 		this.validateProperties();
-
+		//returns the sign in information
 		return new Employee(this.SignInEmployee());
 	}
 
 	// Helper methods
+	//checks employeeId and password not blank
+	//makes sure employee ID is of correct format
 	private void validateProperties() {
 		if (StringUtils.isBlank(this.employeeSignIn.getEmployeeId())) {
 			throw new UnprocessableEntityException("employee ID");
@@ -49,21 +52,23 @@ public class EmployeeSignInCommand implements ResultCommandInterface<Employee> {
 		final Optional<EmployeeEntity> employeeEntity =
 			this.employeeRepository.findByEmployeeId(
 				Integer.parseInt(this.employeeSignIn.getEmployeeId()));
-
+		//check for valid entity
 		if (!employeeEntity.isPresent()
 			|| !Arrays.equals(
 				employeeEntity.get().getPassword(),
+				//encrypts password
 				EmployeeHelper.hashPassword(this.employeeSignIn.getPassword()))
 		) {
 
 			throw new UnauthorizedException();
 		}
-
+		//finds the employee ID
 		final Optional<ActiveUserEntity> activeUserEntity =
 			this.activeUserRepository
 				.findByEmployeeId(employeeEntity.get().getId());
-
+		//checks if the entity is in the database
 		if (!activeUserEntity.isPresent()) {
+			//saves to active user
 			this.activeUserRepository.save(
 					(new ActiveUserEntity())
 						.setSessionKey(this.sessionId)
